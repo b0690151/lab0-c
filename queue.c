@@ -58,7 +58,7 @@ void q_free(struct list_head *head)
         element_t *tmp = NULL;
 
         list_for_each_entry_safe (iter, tmp, head, list) {
-            list_del(&iter->list);
+            list_del_init(&iter->list);
             free(iter->value);
             free(iter);
         }
@@ -99,13 +99,39 @@ bool q_insert_tail(struct list_head *head, char *s)
 /* Remove an element from head of queue */
 element_t *q_remove_head(struct list_head *head, char *sp, size_t bufsize)
 {
-    return NULL;
+    element_t *entry = NULL;
+    if (head && head->next) {  // queue exist and Non empty queue
+        entry = (element_t *) list_entry(head->next, element_t, list);
+        if (sp && entry && entry->value) {
+            int len = strlen(entry->value) + 1;
+            if (len > bufsize) {
+                strncpy(sp, entry->value, bufsize);
+            } else {
+                strncpy(sp, entry->value, len);
+            }
+        }
+        list_del_init(head->next);  // unlink and reset the removed node
+    }
+    return entry;
 }
 
 /* Remove an element from tail of queue */
 element_t *q_remove_tail(struct list_head *head, char *sp, size_t bufsize)
 {
-    return NULL;
+    element_t *entry = NULL;
+    if (head && head->prev != head) {  // queue exist and Non empty queue
+        entry = (element_t *) list_entry(head->prev, element_t, list);
+        if (sp && entry && entry->value) {
+            int len = strlen(entry->value) + 1;
+            if (len > bufsize) {
+                strncpy(sp, entry->value, bufsize);
+            } else {
+                strncpy(sp, entry->value, len);
+            }
+        }
+        list_del_init(head->prev);  // unlink and reset the removed node
+    }
+    return entry;
 }
 
 /* Return number of elements in queue */
@@ -149,7 +175,22 @@ void q_swap(struct list_head *head)
 }
 
 /* Reverse elements in queue */
-void q_reverse(struct list_head *head) {}
+void q_reverse(struct list_head *head)
+{
+    if (head) {
+        struct list_head *curr = head;
+        struct list_head *temp = NULL;
+        while (curr) {
+            temp = curr->next;
+            curr->next = curr->prev;
+            curr->prev = temp;
+            curr = temp;
+            if (curr == head) {
+                break;
+            }
+        }
+    }
+}
 
 /* Reverse the nodes of the list k at a time */
 void q_reverseK(struct list_head *head, int k)

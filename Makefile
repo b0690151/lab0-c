@@ -8,6 +8,8 @@ GIT_HOOKS := .git/hooks/applied
 DUT_DIR := dudect
 all: $(GIT_HOOKS) qtest
 
+CHECK_CMD ?= trace-eg.cmd
+
 tid := 0
 
 # Control test case option of valgrind
@@ -54,7 +56,7 @@ qtest: $(OBJS)
 	$(Q)$(CC) -o $@ $(CFLAGS) -c -MMD -MF .$@.d $<
 
 check: qtest
-	./$< -v 3 -f traces/trace-eg.cmd
+	./$< -v 3 -f traces/$(CHECK_CMD)
 
 test: qtest scripts/driver.py
 	scripts/driver.py -c
@@ -71,7 +73,7 @@ valgrind: valgrind_existence
 	sed -i "s/alarm/isnan/g" $(patched_file)
 	scripts/driver.py -p $(patched_file) --valgrind $(TCASE)
 	@echo
-	@echo "Test with specific case by running command:" 
+	@echo "Test with specific case by running command:"
 	@echo "scripts/driver.py -p $(patched_file) --valgrind -t <tid>"
 
 clean:

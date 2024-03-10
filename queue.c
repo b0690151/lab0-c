@@ -100,7 +100,7 @@ bool q_insert_tail(struct list_head *head, char *s)
 element_t *q_remove_head(struct list_head *head, char *sp, size_t bufsize)
 {
     element_t *entry = NULL;
-    if (head && head->next) {  // queue exist and Non empty queue
+    if (head && (head->next != head)) {  // queue exist and Non empty queue
         entry = (element_t *) list_entry(head->next, element_t, list);
         if (sp && entry && entry->value) {
             int len = strlen(entry->value) + 1;
@@ -119,7 +119,7 @@ element_t *q_remove_head(struct list_head *head, char *sp, size_t bufsize)
 element_t *q_remove_tail(struct list_head *head, char *sp, size_t bufsize)
 {
     element_t *entry = NULL;
-    if (head && head->prev != head) {  // queue exist and Non empty queue
+    if (head && (head->prev != head)) {  // queue exist and Non empty queue
         entry = (element_t *) list_entry(head->prev, element_t, list);
         if (sp && entry && entry->value) {
             int len = strlen(entry->value) + 1;

@@ -156,9 +156,34 @@ int q_size(struct list_head *head)
 
 /* Delete the middle node in queue */
 bool q_delete_mid(struct list_head *head)
-{
-    // https://leetcode.com/problems/delete-the-middle-node-of-a-linked-list/
-    return true;
+{  // https://leetcode.com/problems/delete-the-middle-node-of-a-linked-list/
+    bool result = true;
+
+    if (head && (head->next != head)) {
+        struct list_head *slow = head->next;
+        struct list_head *fast = head->next;
+        struct list_head *prev = head;
+        while ((fast != head) && (fast->next != head)) {  // 1 3 4 7 1 2 6
+            fast = fast->next->next;
+            prev = slow;
+            slow = slow->next;
+        }
+
+        if (fast != slow) {
+            prev->next = slow->next;
+            list_del_init(slow);  // unlink and reset the removed node
+            element_t *e = container_of(slow, element_t, list);
+            free(e->value);
+            free(e);
+
+        } else {
+            head->next = NULL;
+        }
+    } else {
+        result = false;
+    }
+
+    return result;
 }
 
 /* Delete all nodes that have duplicate string */
